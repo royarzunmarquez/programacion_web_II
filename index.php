@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 // Función para generar notificaciones de ofertas especiales
 function generarNotificacionOferta() {
     $ofertas = [
@@ -12,7 +11,6 @@ function generarNotificacionOferta() {
     return $ofertas[$indice];
 }
 $mensajeOferta = generarNotificacionOferta();
-
 // Clase para manejar los destinos y las búsquedas
 class FiltroViaje {
     private $destinos;
@@ -39,7 +37,6 @@ class FiltroViaje {
             ]
         ];
     }
-
     public function buscarDestino($nombreDestino, $fechaViaje) {
         if (array_key_exists($nombreDestino, $this->destinos)) {
             $datosDestino = $this->destinos[$nombreDestino];
