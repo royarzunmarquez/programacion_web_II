@@ -7,14 +7,28 @@ if (isset($_GET['logout'])) {
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
+
+// Incluir el archivo de conexión a la base de datos
+require_once 'conecta.php';
+
+// Verificar si la conexión fue exitosa
+if ($conexion->connect_error) {
+    die("Error de conexión: " . $conexion->connect_error);
+}
+
+// Consulta SQL para obtener todos los registros de la tabla VUELO
+$sql = "SELECT id_vuelo, origen, destino, fecha, plazas_disponibles, precio FROM VUELO";
+$result = $conexion->query($sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agencia de Viajes - Vuelos</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -22,11 +36,10 @@ if (isset($_GET['logout'])) {
     <!-- Barra Superior con Menú y Logo -->
     <?php include('nav.php'); ?>
 
-
     <!-- Cuerpo Principal -->
     <main class="container mt-4">
         <h1>Gestionar Vuelos</h1>
-    <form action="procesar_vuelo.php" method="POST" onsubmit="return validarFormularioVuelo()">
+        <form action="procesar_vuelo.php" method="POST" onsubmit="return validarFormularioVuelo()">
             <div class="form-group">
                 <label for="origen">Origen:</label>
                 <input type="text" class="form-control" id="origen" name="origen" required>
@@ -50,6 +63,38 @@ if (isset($_GET['logout'])) {
             <button type="submit" class="btn btn-primary">Agregar Vuelo</button>
         </form>
         <br>
+
+        <h2 class="text-center mb-4">Lista de Vuelos</h2>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID Vuelo</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Fecha</th>
+                    <th>Plazas Disponibles</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        echo "<tr>
+                                <td>{$row['id_vuelo']}</td>
+                                <td>{$row['origen']}</td>
+                                <td>{$row['destino']}</td>
+                                <td>{$row['fecha']}</td>
+                                <td>{$row['plazas_disponibles']}</td>
+                                <td>{$row['precio']}</td>
+                              </tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='6' class='text-center'>No hay registros disponibles</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
     </main>
 
     <!-- Pie de Página -->
@@ -69,9 +114,10 @@ if (isset($_GET['logout'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Script JavaScript -->
     <script src="java_vuelos.js"></script>
-
 </body>
 </html>
 
-
-
+<?php
+// Cerrar la conexión a la base de datos
+$conexion->close();
+?>
